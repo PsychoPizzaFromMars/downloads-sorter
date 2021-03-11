@@ -1,29 +1,27 @@
 import os
 import shutil
+import configparser
 
-filestofolders = {
-    '.pics': ('.png', '.jpg', '.jpeg', '.bmp'),
-    '.vids': ('.mkv', '.mp4', '.avi', '.mov'),
-    '.trash': ('.torrent'),
-    '.archives': ('.7z', '.rar', '.zip'),
-    '.apps': ('.exe'),
-    '.docs': ('.doc', '.docx', '.pdf'),
-    '.audio': ('.mp3', '.m4a', '.wav')
-    }
-workingdir = r'D:\_Downloads'
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+workingdir = config['DEFAULT']['SortingDirectory']
+filestofolders = {}
 
 os.chdir(workingdir)
-for key in filestofolders.keys():
-    if not os.path.exists(key):
-        os.mkdir(key)
+for extensionsfolder in config['Extensions']:
+    filestofolders[extensionsfolder] = tuple(
+        config['Extensions'][extensionsfolder].split())
+    if not os.path.exists(extensionsfolder):
+        os.mkdir(extensionsfolder)
 
 listdir = os.listdir(workingdir)
 for fileitem in listdir:
     for item in filestofolders.items():
         if fileitem.lower().endswith(item[1]):
             try:
-                shutil.move(os.path.join(workingdir, fileitem), item[0] + "/" + os.path.basename(fileitem))
+                shutil.move(os.path.join(workingdir, fileitem),
+                            item[0] + "/" + os.path.basename(fileitem))
             except:
                 break
-
-                
